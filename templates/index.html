@@ -58,7 +58,12 @@ iframe {
 }
 
 #status p.error {
-  color: #922;
+  color: #922!important;
+  font-weight: bold;
+}
+
+#status p.error:before {
+  content: "Error: ";
 }
 
 #status p:last-child {
