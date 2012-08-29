@@ -107,7 +107,9 @@ iframe {
   _(function() {
 
     _('#main').submit(function() {
-      _('#status').html('submitted..');
+      _('#status').html('<p>Running importer</p>');
+      _('.control-group.error').removeClass('error');
+
       timer = setInterval(function() {
 
         _.ajax({
@@ -117,6 +119,9 @@ iframe {
             if (_('#status').html() != c) {
               _('#status').html(c);
               if (c.indexOf('finished.') > 0 || c.indexOf('error') > 0) {
+                if (c.indexOf('error') > 0) {
+                  $('input[name='+_('#status .error').data('field')+']').parent().parent().addClass('error');
+                }
                 clearInterval(timer);
               }
             }

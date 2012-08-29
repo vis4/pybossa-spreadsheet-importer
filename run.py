@@ -35,27 +35,30 @@ class submit:
         pbclient.set('api_key', data.api_key)
         app = pbclient.find_app(short_name=data.appname)
         if len(app) == 0:
-            last_status += '<p class="error">PyBossa app not found.</p>'
+            last_status += '<p class="error" data-field="appname">PyBossa app not found.</p>'
         else:
             app = app[0]
             res = pbclient.update_app(app)
             if res == 403:
-                last_status += '<p class="error">You\'re not allowed to edit that app. Double check your API key.</p>'
+                last_status += '<p class="error" data-field="api_key">You\'re not allowed to edit that app. Double check your API key.</p>'
             else:
                 last_status += '<p>Loading data from Google spreadsheet <i class="loading"></i></p>'
                 url = 'http://spreadsheets.google.com/feeds/cells/%s/%s/public/basic?alt=json' % (data.spreadsheet, data.worksheet)
                 r = requests.get(url)
-                last_status += '<p>Parsing spreadsheet data <i class="loading"></i></p>'
-                tasks = parse_spreadsheet(r.json)
-                tmp = last_status
-                total = len(tasks)
-                completed = 0
-                for info in tasks:
-                    info['n_answers'] = int(data.n_answers)
-                    res = pbclient.create_task(app.id, info)
-                    completed += 1
-                    last_status = tmp + '<p>Uploading tasks to PyBossa (%d of %d)<i class="loading"></i></p>' % (completed, total)
-                last_status += '<p>finished.</p>'
+                if r.status_code / 100 == 4:
+                    last_status += '<p class="error" data-field="spreadsheet">The spreadsheet could not be found. Make sure that the key is right and that you properly shared the document (click on <i>File > Publish to the web</i>).</p>'
+                else:
+                    last_status += '<p>Parsing spreadsheet data <i class="loading"></i></p>'
+                    tasks = parse_spreadsheet(r.json)
+                    tmp = last_status
+                    total = len(tasks)
+                    completed = 0
+                    for info in tasks:
+                        info['n_answers'] = int(data.n_answers)
+                        res = pbclient.create_task(app.id, info)
+                        completed += 1
+                        last_status = tmp + '<p>Uploading tasks to PyBossa (%d of %d)<i class="loading"></i></p>' % (completed, total)
+                    last_status += '<p>finished.</p>'
         print ''
 
 
