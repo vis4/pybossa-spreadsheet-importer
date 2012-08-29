@@ -120,7 +120,7 @@ iframe {
               _('#status').html(c);
               if (c.indexOf('finished.') > 0 || c.indexOf('error') > 0) {
                 if (c.indexOf('error') > 0) {
-                  $('input[name='+_('#status .error').data('field')+']').parent().parent().addClass('error');
+                  _('input[name='+_('#status .error').data('field')+']').parent().parent().addClass('error');
                 }
                 clearInterval(timer);
               }
